@@ -1,0 +1,9 @@
+Django
+zmq
+django-adminrestrict
+pycryptodome
+django-recaptcha
+requests
+numpy
+django-cors-headers 
+opencv-python-headless

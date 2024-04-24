@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+<head>
+    <title>
+        Home
+    </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script>
+      function httpGet(theUrl) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", theUrl, false); // false for synchronous request
+        xmlHttp.send(null);
+        return xmlHttp.responseText;
+      }
+      function schimbare(){
+        var response = httpGet("/forgot_password/?email={{email}}");
+        if(response.includes("Succes!")){
+          alert("Verificati adresa de email");
+        }else{
+          alert("A aparut o eroare!");
+        }
+      }
+      function modificare_email(){
+        var email = document.getElementById("email").value;
+        var response = httpGet("/change_email/?email="+email);
+        if(response.includes("Succes!")){
+          alert("Succes! Va rugam confirmati adresa de email");
+        }else{
+          alert("A aparut o eroare!");
+        }
+      }
+      function stergere_cont(){
+        var ok = confirm("Sigur doriti sa stergeti contul?");
+        if(!ok)
+          return;
+        var response = httpGet("/delete_account");
+        if(response.includes("succes!")){
+          alert("Succes!");
+          window.location='/login';
+        }else{
+          alert("A aparut o eroare!");
+        }
+      }
+    </script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse visible-xs">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Logo</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li><a href="/">Dashboard</a></li>
+                    <li><a href="/camera">Camera</a></li>
+                    <li class='active'><a href="">{{username}}</a></li>
+                    <li><a href="/settings">Settings</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row content">
+            <div class="col-sm-3 sidenav hidden-xs">
+                <h2>Logo</h2>
+                <ul class="nav nav-pills nav-stacked">
+                    <li><a href="/">Dashboard</a></li>
+                    <li><a href="/camera">Camera</a></li>
+                    <li class='active'><a href="">{{username}}</a></li>
+                    <li><a href="/settings">Settings</a></li>
+                </ul><br>
+            </div>
+            <br>
+
+            <div class="col-sm-9">
+                <div class="row flex">
+                  <div class="col-sm-3">
+                      <div class="well small">
+                          <h4>Modifica adresa de email</h4>
+                          <input type="email" id="email" />
+                          <br/><br/>
+                          <button onclick="modificare_email()">Salvare</button>
+                      </div>
+                  </div>
+                </div>
+                <div class="row flex">
+                  <div class="col-sm-3">
+                    <div class="well small">
+                        <h4>Schimbare parola</h4>
+                          <button onclick="schimbare()">
+                              Schimbare
+                          </button>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="well small">
+                        <h4>Log out</h4>
+                        <a href="/logout" style="color:black; text-decoration: none;">
+                            <button>
+                                Log out
+                            </button>
+                        </a>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="well small">
+                        <h4>Stergere cont</h4>
+                        <button onclick="stergere_cont()">
+                              Stergere
+                        </button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+<head>
+  <title>
+    Home
+  </title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'style.css' %}" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  
+</head>
+
+<body>
+  <script>var uids = []; var types = [];</script>
+  <nav class="navbar navbar-inverse visible-xs">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="">Logo</a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="">Dashboard</a></li>
+          <li><a href="/camera">Camera</a></li>
+          <li><a href="/profile">{{username}}</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row content">
+      <div class="col-sm-3 sidenav hidden-xs">
+        <h2>Logo</h2>
+        <ul class="nav nav-pills nav-stacked">
+          <li class="active"><a href="">Dashboard</a></li>
+          <li><a href="/camera">Camera</a></li>
+          <li><a href="/profile">{{username}}</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </ul><br>
+      </div>
+      <br>
+
+      <div class="col-sm-9">
+
+        {% if pir|length > 0%}
+        <div class="row flex">
+          {% for p in pir %}
+          <script>uids.push("{{p.uid}}"); types.push("PIR");</script>
+          <div class="col-sm-3">
+            <div class="well small">
+              <h4>
+                <span id="name-PIR-{{p.uid}}">{{p.name}}</span>
+                <p class="delete-btn" onclick="delete_item('{{p.uid}}', 'PIR');">&nbsp;&nbsp;X&nbsp;</p>
+                <img class="edit-btn" src="{% static 'images/pencil.png' %}" onclick="edit_name('name-PIR-{{p.uid}}')"/>
+              </h4>
+              <p id="miscare-{{p.uid}}">Ultima miscare: {{p.timestamp |date:' H:i d.m.Y'}}</p>
+            </div>
+          </div>
+          {%endfor%}
+        </div>
+        {%endif%}
+
+        {% if usa|length > 0%}
+        <div class="row flex">
+          {% for u in usa %}
+          <script>uids.push("{{u.uid}}"); types.push("USA");</script>
+          <div class="col-sm-3">
+            <div class="well small">
+              <h4>
+                <span id="name-USA-{{u.uid}}">{{u.name}}</span>
+                <p class="delete-btn" onclick="delete_item('{{u.uid}}', 'USA');">&nbsp;&nbsp;X&nbsp;</p>
+                <img class="edit-btn" src="{% static 'images/pencil.png' %}" onclick="edit_name('name-USA-{{u.uid}}')"/>
+              </h4>
+              <p id="stare-{{u.uid}}">Stare: {%if u.value%}deschis{%else%}inchis{%endif%}</p>
+            </div>
+          </div>
+          {%endfor%}
+        </div>
+        {%endif%}
+
+        {% if dht|length > 0%}
+        <div class="row flex">
+          {% for d in dht %}
+          <script>uids.push("{{d.uid}}"); types.push("DHT");</script>
+          <div class="col-sm-3">
+            <div class="well small">
+              <h4>
+                <span id="name-DHT-{{d.uid}}">{{d.name}}</span>
+                <p class="delete-btn" onclick="delete_item('{{d.uid}}', 'DHT');">&nbsp;&nbsp;X&nbsp;</p>
+                
+                <img class="edit-btn" src="{% static 'images/pencil.png' %}" onclick="edit_name('name-DHT-{{d.uid}}')"/>
+              </h4>
+              <p id="temp-{{d.uid}}">Temperatura {{d.temperature}}&deg;C</p>
+              <p id="hum-{{d.uid}}">Umiditate {{d.humidity}}%</p>
+            </div>
+          </div>
+          {%endfor%}
+        </div>
+        {%endif%}
+
+        {% if cam|length > 0%}
+        <div class="row flex">
+          {% for c in cam %}
+          <script>uids.push("{{c.uid}}"); types.push("CAMERA");</script>
+          <div class="col-sm-6">
+            <div class="well small">
+              <h4>
+                  <span id="name-CAMERA-{{c.uid}}">{{c.name}}</span>
+                  <p class="delete-btn" onclick="delete_item('{{c.uid}}', 'CAMERA');">&nbsp;&nbsp;X&nbsp;</p>
+                  
+                  <img class="edit-btn" src="{% static 'images/pencil.png' %}" onclick="edit_name('name-CAMERA-{{c.uid}}')"/>
+              </h4>
+              <img id='cam{{c.uid}}' alt="{{c.name}} unavailable" class='hidden-xs'></img>
+              <img id='cam1{{c.uid}}' alt="{{c.name}} unavailable" class='visible-xs'></img>
+            </div>
+          </div>
+          {%endfor%}
+          
+        </div>
+        {%endif%}
+        
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    function httpGet(theUrl) {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open("GET", theUrl, false); // false for synchronous request
+      xmlHttp.send(null);
+      return xmlHttp.responseText;
+    }
+    var timer_id;
+    function refresh_components() {
+      console.log("refresh");
+      var url = "/data/?n=" + uids.length;
+      for (let i = 0; i < uids.length; i++) {
+        url = url + "&uid"+(i+1)+"=" + uids[i] + "&type"+ (i+1) +"=" + types[i];
+      }
+      var r = httpGet(url);
+      var j = JSON.parse(r);
+      var data = j.data;
+      for (let i = 0; i < uids.length; i++) {
+        document.getElementById("name-"+types[i]+"-"+uids[i]).innerHTML = data[i].name;
+        if(types[i] == "PIR"){
+          document.getElementById("miscare-"+uids[i]).innerHTML = "Ultima miscare: " + data[i].timestamp;
+        }else if(types[i] == "USA"){
+          document.getElementById("stare-"+uids[i]).innerHTML = "Stare: " + (data[i].value=="1"?"deschis":"inchis");
+        }else if(types[i] == "DHT"){
+          document.getElementById("temp-"+uids[i]).innerHTML = "Temperatura " + data[i].temperature + "&deg;C";
+          document.getElementById("hum-"+uids[i]).innerHTML = "Umiditate " + data[i].humidity + "%";
+        }
+      }
+
+      timer_id = setTimeout(() =>{refresh_components();}, 20000);
+    }
+
+    function edit_name(name_id){
+      var arr = name_id.split('-');
+      var old_name = document.getElementById(name_id).innerHTML;
+      var name = prompt("Introduceti numele pentru " + arr[1] + ' ' + arr[2], old_name);
+      if(name != null && name.length > 0){ 
+        var url = "/edit_name/?name=" + encodeURIComponent(name) + "&type=" + arr[1] + "&uid=" + arr[2];
+        fetch(url);
+        console.log("schimbat");
+        clearTimeout(timer_id);
+        timer_id = setTimeout(() =>{refresh_components();}, 100);
+      }
+    }
+    function delete_item(uid, type){
+      var url = "/delete_device/?type=" + type + "&uid=" + uid;
+      var response = httpGet(url);
+      if (response.includes('@success')) {
+        setTimeout(() =>{location.reload();}, 200);
+      }
+    }
+    var stream_uids = [];
+    function start_stream(uid){
+      httpGet("/start_stream/?status=1&uid="+uid);
+      setTimeout(() => {
+        start_stream(uid);
+      }, 60000);
+      if(!stream_uids.includes(uid)){
+        stream_uids.push(uid);
+        setTimeout(() => {
+          refresh_stream(uid);
+        }, 3000);
+      }
+    }
+    var X=0;
+    var streams_online = [];
+    function refresh_stream(uid){
+      
+      if(!streams_online.includes(uid)){
+        var image = httpGet("/livefeed/?uid=" + uid + "&X="+X);
+
+
+        if(image == "None"){
+          setTimeout(() => {
+            refresh_stream(uid);
+          }, 2000 );
+          return;
+        }
+        streams_online.push(uid);
+      }
+    
+      var img = document.getElementById("cam"+uid);
+      //console.log(img);
+      X++;
+      X = X%100000;
+      img.src = "/livefeed/?uid=" + uid + "&X="+X;
+      img.width = Math.floor(window.innerWidth / 3);
+      
+      var img = document.getElementById("cam1"+uid);
+      //console.log(img);
+      img.src = "/livefeed/?uid=" + uid + "&X="+X;
+      img.width = Math.floor(window.innerWidth / 1.2);
+      
+      setTimeout(() => {
+        refresh_stream(uid);
+      }, 200 );
+    }
+    
+    function on_load(){
+      {% for c in cam %}
+        start_stream('{{c.uid}}');
+      {%endfor%}
+      refresh_components();
+      
+    }
+    
+    window.onload = on_load();
+    window.onbeforeunload = function(){
+        {% for c in cam %}
+          httpGet("/start_stream/?status=0&uid=" + '{{c.uid}}');
+        {%endfor%}
+    }
+  </script>
+</body>
+
+</html>

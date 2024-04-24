@@ -1,0 +1,43 @@
+.row.content {
+  height: 550px;
+}
+.sidenav {
+  background-color: #f1f1f1;
+  height: 100%;
+}       
+@media screen and (max-width: 767px) {
+  .row.content {height: auto;} 
+}
+.big{
+  height: 300px;
+}
+.small{
+  justify-content: center;
+  font-size:100%;
+  /* min-height: 180px; */
+}
+.flex{
+
+  display: flex;
+  display: -webkit-flex;
+  flex-wrap: wrap;
+}
+.edit-btn{
+  width: 15px;
+  height: 15px;
+  float: right;
+  margin-top:-10px;
+}
+.edit-btn:hover{
+  cursor: pointer;
+}
+.delete-btn{
+  width: 15px;
+  height: 15px;
+  float: right;
+  margin-top:-10px;
+}
+.delete-btn:hover{
+  color:red;
+  cursor: pointer;
+}

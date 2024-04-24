@@ -1,0 +1,310 @@
+{% load l10n %}
+{%localize off%}
+<!DOCTYPE html>
+{%load static%}
+<html>
+	<head>
+		<meta name="viewport" content="user-scalable=no,width=device-width, initial-scale=1.0">
+		<title>Istoric</title>
+		{%if telefon%}
+      			<link rel="stylesheet" type="text/css" href="{%static 'css/style_telefon.css' %}">
+    		{%else%}
+      			<link rel="stylesheet" type="text/css" href="{%static 'css/style.css' %}">
+    		{%endif%}
+		<script>
+			var img_arr = [];
+			var drop1;
+			var drop2;
+			var chev1, chev2;
+			var slider;
+			var play_btn;
+			{%for e in entries%}
+				var {{e.id}};
+				var {{e.id}}_chev;
+				{%for e1 in e.entries%}
+					var {{e1.id}};
+					var {{e1.id}}_chev;
+					{%for e2 in e1.entries%}
+						var {{e2.id}};
+					{%endfor%}
+				{%endfor%}
+			{%endfor%}
+			function toggle1() {
+				if (drop1.classList.contains('show'))
+					document.getElementById("dropdown1").classList.remove("opacity");
+
+				document.getElementById("dropdown1").classList.toggle("show");
+				if (drop1.classList.contains('show'))
+					document.getElementById("btn1").focus();
+				
+				chev1.classList.toggle("gg-chevron-down");
+				chev1.classList.toggle("gg-chevron-up");
+				
+				if (drop1.classList.contains('show'))
+					document.getElementById("dropdown1").classList.add("opacity");
+			}
+			function toggle2() {
+				if (drop2.classList.contains('show'))
+					document.getElementById("dropdown2").classList.remove("opacity");
+
+				document.getElementById("dropdown2").classList.toggle("show");
+				if (drop2.classList.contains('show'))
+					document.getElementById("btn2").focus();
+
+				chev2.classList.toggle("gg-chevron-down");
+				chev2.classList.toggle("gg-chevron-up");
+				if (drop2.classList.contains('show'))
+					document.getElementById("dropdown2").classList.add("opacity");
+			}
+			{%for e in entries%}
+				function func_{{e.id}}(){
+					console.log("func1");
+					{{e.id}}_chev.classList.toggle("gg-chevron-right");
+					{{e.id}}_chev.classList.toggle("gg-chevron-down");
+					{%for e1 in e.entries%}
+						{{e1.id}}.classList.toggle("hidden");
+						{{e1.id}}_chev.classList.add("gg-chevron-right");
+						{{e1.id}}_chev.classList.remove("gg-chevron-down");
+						{%for e2 in e1.entries%}
+							{{e2.id}}.classList.add("hidden");
+						{%endfor%}
+					{%endfor%}
+				}
+				{%for e1 in e.entries%}
+					function func_{{e1.id}}(){
+						console.log("func2");
+						{%for e2 in e1.entries%}
+							{{e2.id}}.classList.toggle("hidden");
+						{%endfor%}
+						{{e1.id}}_chev.classList.toggle("gg-chevron-right");
+						{{e1.id}}_chev.classList.toggle("gg-chevron-down");
+					}
+				{%endfor%}
+			{%endfor%}
+			function slider_function(){
+				if(img_arr[slider.value-1] == null)
+					return;
+				img_arr[slider.value-1].classList.add("img_shown");
+				img_arr[slider.value-1].classList.remove("img_hidden");
+				for(var i=0;i<{{N}};i++){
+					if(i!=slider.value-1){
+						img_arr[i].classList.remove("img_shown");
+						img_arr[i].classList.add("img_hidden");
+					}
+				}
+			}
+			var is_playing=0;
+			function recursiv(){
+				if(parseInt(slider.value)=={{N}}){
+					play_slider();
+					return;
+				}
+				if(is_playing==false)
+					return;
+				
+				slider.value=parseInt(slider.value)+1;
+				slider_function();
+
+				setTimeout(recursiv, 500);
+
+			}
+			function play_slider(){
+				is_playing=!is_playing;
+				if(!is_playing){
+					play_btn.textContent="Play";
+					slider.value=1;
+					slider_function();
+				}else{
+					play_btn.textContent="Stop";
+					recursiv();
+				}
+			}
+
+			window.onload = function(){
+
+				for(var i=0;i<{{N}};i++)
+					img_arr[i]=document.getElementById("image_"+i);
+
+				if(img_arr[0] != null){
+					document.getElementById("nu_exista").classList.add("img_hidden");
+					img_arr[0].classList.remove("img_hidden");
+					img_arr[0].classList.remove("img_shown");
+				}else{
+					document.getElementById("center").classList.add("img_hidden");
+				}
+
+				drop1=document.getElementById("dropdown1");
+				drop2=document.getElementById("dropdown2");
+				chev1=document.getElementById("chev1");
+				chev2=document.getElementById("chev2");
+				aaa=document.getElementById("id_1_1");
+				{%for e in entries%}
+					{{e.id}}=document.getElementById("{{e.id}}");
+					{{e.id}}_chev=document.getElementById("{{e.id}}_chev");
+					{%for e1 in e.entries%}
+						{{e1.id}}=document.getElementById("{{e1.id}}");
+						{{e1.id}}_chev=document.getElementById("{{e1.id}}_chev");
+						{%for e2 in e1.entries%}
+							{{e2.id}}=document.getElementById("{{e2.id}}");
+						{%endfor%}
+					{%endfor%}
+				{%endfor%}
+				window.onclick = function(e) {
+					// console.log(e.target);
+					if (!e.target.matches('#btn1') && !e.target.matches("#chev1")) {
+						if (drop1.classList.contains('show'))
+							drop1.classList.remove('show');
+						if(chev1.classList.contains('gg-chevron-up')){
+							chev1.classList.remove('gg-chevron-up');
+							chev1.classList.add('gg-chevron-down');
+						}
+					}
+					if (!e.target.matches('#btn2') && !e.target.matches("#chev2")) {
+						if (drop2.classList.contains('show'))
+							drop2.classList.remove('show');
+						if(chev2.classList.contains('gg-chevron-up')){
+							chev2.classList.remove('gg-chevron-up');
+							chev2.classList.add('gg-chevron-down');
+						}
+					}
+				}
+				slider=document.getElementById("slider");
+				play_btn=document.getElementById("play_btn");
+				slider.oninput=slider_function;
+			}
+		</script>
+		<style>
+			.img_hidden{
+				display:none;
+			}
+			.img_shown{
+				display:block;
+			}
+			{%if telefon%}
+			img{
+				width: 95vw;
+			}
+			{%else%}
+			img{
+				width: 50vw;
+			}
+			{%endif%}
+			button{
+				color:black;
+				font-size:x-large;
+				background-color: #888;
+				box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+				border-color: black;
+				border-radius: 20px;
+			}
+		</style>
+	</head>
+	<body style="padding-top:60px;">
+		<div class='header'>
+			<ul class="navbar">
+				<li class="hover">
+					<a href="../">
+						Înapoi
+					</a>
+				</li>
+				{%if not telefon%}
+				<li style="float:right;border-right:none;border-left:2px solid #ddd;">
+					<a style="display:inline-block;margin-top:7px;">
+						Vizualizare ultimele: 
+					</a>
+						<div class="dropdown">
+							<button id="btn2" class="dropbtn" onclick="toggle2()"> {{selected_num}} <i class="gg-chevron-down" id="chev2"></i></button>
+							<div class="dropdown-content" id="dropdown2">
+								{%if selected_opt == "luni" %}
+									<a href="/image_history/?luni=3">3</a>
+									<a href="/image_history/?luni=6">6</a>
+									<a href="/image_history/?luni=12">12</a>
+								{%else%}
+									<a href="/image_history/?zile=7">7</a>
+									<a href="/image_history/?zile=14">14</a>
+									<a href="/image_history/?zile=30">30</a>
+								{%endif%}
+							</div>
+						</div>
+					<a style="display:inline-block;padding-left:8px;">
+						{%if selected_num > 19%}
+						de 
+						{%endif%}
+						{{selected_opt}}
+					</a>
+				</li>
+				<li style="float:right;border-right:none;border-left:2px solid #ddd;">
+					<a style="display:inline-block;margin-top:7px">
+						Vizualizare date pe: 
+					</a>
+						<div class="dropdown" style="margin-right:16px;">
+							<button id="btn1" class="dropbtn" onclick="toggle1()">{{selected_opt}} <i class="gg-chevron-down" id="chev1"></i></button>
+							<div class="dropdown-content" id="dropdown1">
+								<a href="/image_history/?zile=30">zile</a>
+								<a href="/image_history/?luni=3">luni</a>
+							</div>
+						</div>
+				</li>
+				<li class="hover" style="float:right;border-right:none;border-left:2px solid #ddd;">
+					<a href="/graph/?{{selected_opt}}={{selected_num}}">
+						Grafic
+					</a>
+				</li>
+				<li class="hover" style="float:right;border-right:none;border-left:2px solid #ddd;">
+					<a href="/log/?{{selected_opt}}={{selected_num}}">
+						Istoric
+					</a>
+				</li>
+				{%else%}
+
+				<li style="float:right;border:none;">
+					<a style="display:inline-block;margin-top:7px;">
+						Vizualizare
+					</a>
+						<div class="dropdown">
+							<button id="btn2" class="dropbtn" onclick="toggle2()"> {{selected_num}} <i class="gg-chevron-down" id="chev2"></i></button>
+							<div class="dropdown-content" id="dropdown2">
+								{%if selected_opt == "luni" %}
+									<a href="/image_history/?luni=3">3</a>
+									<a href="/image_history/?luni=6">6</a>
+									<a href="/image_history/?luni=12">12</a>
+								{%else%}
+									<a href="/image_history/?zile=7">7</a>
+									<a href="/image_history/?zile=14">14</a>
+									<a href="/image_history/?zile=30">30</a>
+								{%endif%}
+							</div>
+						</div>
+						<a style="padding-left:2px;display:inline-block;margin-top:7px;">
+							{%if selected_num > 19 %}
+							de
+							{%endif%}
+						</a>
+						<div class="dropdown" style="margin-right:10px;">
+						<button id="btn1" class="dropbtn" onclick="toggle1()">{{selected_opt}} <i class="gg-chevron-down" id="chev1"></i></button>
+						<div class="dropdown-content" id="dropdown1">
+							<a href="/image_history/?zile=30">zile</a>
+							<a href="/image_history/?luni=3">luni</a>
+						</div>
+					</div>
+				</li>
+				{%endif%}
+			</ul>
+		</div>
+		<br/>
+		<h1 id="nu_exista"><center>Nu exista imagini!</center></h1>
+		<center id="center">
+			{%for e in images%}
+				<div class="img_hidden" id="image_{{e.i}}">
+					<img src="{{e.url}}"></img>
+					<h3>{{e.date_str}}</h3>
+				</div>
+			{% endfor%}
+			<input type="range" min="1" max="{{N}}" value="1" class="img_slider" id="slider"></input>
+			<br/><br/>
+			<button id="play_btn" onclick="play_slider()">Play</button>
+			<br/><br/>
+		</center>
+	</body>
+</html>
+{%endlocalize%}
