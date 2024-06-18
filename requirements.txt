@@ -7,3 +7,4 @@ requests
 numpy
 django-cors-headers 
 opencv-python-headless
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
